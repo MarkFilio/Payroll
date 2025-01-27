@@ -1,0 +1,340 @@
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class EnhancedPayrollSystem {
+
+    // Phone book to store employee contact details
+    static HashMap<String, String> phoneBook = new HashMap<>();
+    static HashMap<String, ArrayList<String>> groups = new HashMap<>(); // Groups to categorize employees
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        // Main Menu Loop
+        do {
+            System.out.println("\n--- Main Menu ---");
+            System.out.println("1. Payroll System");
+            System.out.println("2. Calculator");
+            System.out.println("3. Phone Book");
+            System.out.println("4. Help");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    payrollModule(scanner);
+                    break;
+                case 2:
+                    calculatorModule(scanner);
+                    break;
+                case 3:
+                    phoneBookModule(scanner);
+                    break;
+                case 4:
+                    displayHelp();
+                    break;
+                case 5:
+                    System.out.println("Exiting the system. Goodbye!");
+                    break;
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        } while (choice != 5);
+
+        scanner.close();
+    }
+
+    // Payroll System Module
+    public static void payrollModule(Scanner scanner) {
+        System.out.println("\n--- Payroll System ---");
+        System.out.print("Enter Employee Name: ");
+        scanner.nextLine(); // Consume newline
+        String name = scanner.nextLine();
+
+        System.out.print("Enter Employee ID: ");
+        String empId = scanner.nextLine();
+
+        System.out.print("Enter Hourly Rate: ");
+        double hourlyRate = scanner.nextDouble();
+
+        System.out.print("Enter Hours Worked: ");
+        double hoursWorked = scanner.nextDouble();
+
+        System.out.print("Enter Overtime Hours Worked: ");
+        double overtimeHours = scanner.nextDouble();
+
+        System.out.print("Enter Bonus (if any): ");
+        double bonus = scanner.nextDouble();
+
+        System.out.print("Enter Tax Percentage (e.g., 10 for 10%): ");
+        double taxPercentage = scanner.nextDouble();
+
+        // Calculations
+        double overtimePay = overtimeHours * hourlyRate * 1.5; // OT pay is 1.5x the hourly rate
+        double grossPay = (hourlyRate * hoursWorked) + overtimePay + bonus;
+        double tax = (taxPercentage / 100) * grossPay;
+        double netPay = grossPay - tax;
+
+        // Output payroll details
+        System.out.println("\n--- Payroll Details ---");
+        System.out.println("Employee Name: " + name);
+        System.out.println("Employee ID: " + empId);
+        System.out.println("Regular Pay: $" + String.format("%.2f", hourlyRate * hoursWorked));
+        System.out.println("Overtime Pay: $" + String.format("%.2f", overtimePay));
+        System.out.println("Bonus: $" + String.format("%.2f", bonus));
+        System.out.println("Gross Pay: $" + String.format("%.2f", grossPay));
+        System.out.println("Tax Deducted: $" + String.format("%.2f", tax));
+        System.out.println("Net Pay: $" + String.format("%.2f", netPay));
+
+        // Save to phone book
+        System.out.print("Enter Employee Phone Number: ");
+        scanner.nextLine(); // Consume newline
+        String phoneNumber = scanner.nextLine();
+        phoneBook.put(name, phoneNumber);
+
+        System.out.println("Employee details saved to the phone book!");
+    }
+
+    // Calculator Module
+    public static void calculatorModule(Scanner scanner) {
+        System.out.println("\n--- Calculator ---");
+        System.out.print("Enter first number: ");
+        double num1 = scanner.nextDouble();
+
+        System.out.print("Enter operator (+, -, *, /): ");
+        char operator = scanner.next().charAt(0);
+
+        System.out.print("Enter second number: ");
+        double num2 = scanner.nextDouble();
+
+        double result = 0;
+        boolean valid = true;
+
+        switch (operator) {
+            case '+':
+                result = num1 + num2;
+                break;
+            case '-':
+                result = num1 - num2;
+                break;
+            case '*':
+                result = num1 * num2;
+                break;
+            case '/':
+                if (num2 != 0) {
+                    result = num1 / num2;
+                } else {
+                    System.out.println("Error: Division by zero is not allowed.");
+                    valid = false;
+                }
+                break;
+            default:
+                System.out.println("Invalid operator!");
+                valid = false;
+        }
+
+        if (valid) {
+            System.out.println("Result: " + result);
+        }
+    }
+
+    // Phone Book Module
+    public static void phoneBookModule(Scanner scanner) {
+        System.out.println("\n--- Phone Book ---");
+        System.out.println("1. View All Contacts");
+        System.out.println("2. Search for an Employee");
+        System.out.println("3. Add a New Employee");
+        System.out.println("4. Delete an Employee");
+        System.out.println("5. Manage Groups");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1:
+                viewAllContacts();
+                break;
+            case 2:
+                searchEmployee(scanner);
+                break;
+            case 3:
+                addNewEmployee(scanner);
+                break;
+            case 4:
+                deleteEmployee(scanner);
+                break;
+            case 5:
+                manageGroups(scanner);
+                break;
+            default:
+                System.out.println("Invalid choice! Returning to main menu.");
+        }
+    }
+
+    // View All Contacts in Phone Book
+    public static void viewAllContacts() {
+        System.out.println("\n--- All Contacts ---");
+        if (phoneBook.isEmpty()) {
+            System.out.println("The phone book is empty.");
+        } else {
+            for (String name : phoneBook.keySet()) {
+                System.out.println("Name: " + name + ", Phone: " + phoneBook.get(name));
+            }
+        }
+    }
+
+    // Search for an Employee in Phone Book
+    public static void searchEmployee(Scanner scanner) {
+        System.out.print("Enter Employee Name to Search: ");
+        scanner.nextLine(); // Consume newline
+        String searchName = scanner.nextLine();
+
+        if (phoneBook.containsKey(searchName)) {
+            System.out.println("Name: " + searchName + ", Phone: " + phoneBook.get(searchName));
+        } else {
+            System.out.println("Employee not found in the phone book.");
+        }
+    }
+
+    // Add a New Employee to Phone Book
+    public static void addNewEmployee(Scanner scanner) {
+        System.out.println("\n--- Add New Employee ---");
+        scanner.nextLine(); // Consume newline
+        System.out.print("Enter Employee Name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter Employee Phone Number: ");
+        String phoneNumber = scanner.nextLine();
+
+        if (phoneBook.containsKey(name)) {
+            System.out.println("Employee already exists. Use a different name or update the contact details.");
+        } else {
+            phoneBook.put(name, phoneNumber);
+            System.out.println("Employee added successfully!");
+        }
+    }
+
+    // Delete an Employee from Phone Book
+    public static void deleteEmployee(Scanner scanner) {
+        System.out.print("Enter Employee Name to Delete: ");
+        scanner.nextLine(); // Consume newline
+        String deleteName = scanner.nextLine();
+
+        if (phoneBook.containsKey(deleteName)) {
+            phoneBook.remove(deleteName);
+            System.out.println("Employee " + deleteName + " has been removed from the phone book.");
+        } else {
+            System.out.println("Employee not found in the phone book.");
+        }
+    }
+
+    // Manage Groups in Phone Book
+    public static void manageGroups(Scanner scanner) {
+        System.out.println("\n--- Manage Groups ---");
+        System.out.println("1. Create a New Group");
+        System.out.println("2. Add Employee to Group");
+        System.out.println("3. View Group Members");
+        System.out.println("4. Delete a Group");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1:
+                createGroup(scanner);
+                break;
+            case 2:
+                addEmployeeToGroup(scanner);
+                break;
+            case 3:
+                viewGroupMembers(scanner);
+                break;
+            case 4:
+                deleteGroup(scanner);
+                break;
+            default:
+                System.out.println("Invalid choice! Returning to phone book menu.");
+        }
+    }
+
+    // Create a New Group
+    public static void createGroup(Scanner scanner) {
+        System.out.print("Enter Group Name: ");
+        scanner.nextLine(); // Consume newline
+        String groupName = scanner.nextLine();
+
+        if (groups.containsKey(groupName)) {
+            System.out.println("Group already exists.");
+        } else {
+            groups.put(groupName, new ArrayList<>());
+            System.out.println("Group created successfully!");
+        }
+    }
+
+    // Add Employee to Group
+    public static void addEmployeeToGroup(Scanner scanner) {
+        System.out.print("Enter Group Name: ");
+        scanner.nextLine(); // Consume newline
+        String groupName = scanner.nextLine();
+
+        if (!groups.containsKey(groupName)) {
+            System.out.println("Group does not exist. Create it first.");
+        } else {
+            System.out.print("Enter Employee Name to Add: ");
+            String employeeName = scanner.nextLine();
+
+            if (!phoneBook.containsKey(employeeName)) {
+                System.out.println("Employee not found in phone book. Add them first.");
+            } else {
+                groups.get(groupName).add(employeeName);
+                System.out.println("Employee added to group successfully!");
+            }
+        }
+    }
+
+    // View Group Members
+    public static void viewGroupMembers(Scanner scanner) {
+        System.out.print("Enter Group Name: ");
+        scanner.nextLine(); // Consume newline
+        String groupName = scanner.nextLine();
+
+        if (groups.containsKey(groupName)) {
+            ArrayList<String> members = groups.get(groupName);
+            System.out.println("Group: " + groupName);
+            if (members.isEmpty()) {
+                System.out.println("No members in this group.");
+            } else {
+                for (String member : members) {
+                    System.out.println("Name: " + member + ", Phone: " + phoneBook.get(member));
+                }
+            }
+        } else {
+            System.out.println("Group does not exist.");
+        }
+    }
+
+    // Delete a Group
+    public static void deleteGroup(Scanner scanner) {
+        System.out.print("Enter Group Name to Delete: ");
+        scanner.nextLine(); // Consume newline
+        String groupName = scanner.nextLine();
+
+        if (groups.containsKey(groupName)) {
+            groups.remove(groupName);
+            System.out.println("Group deleted successfully.");
+        } else {
+            System.out.println("Group does not exist.");
+        }
+    }
+
+    // Display Help Menu
+    public static void displayHelp() {
+        System.out.println("\n--- Help Menu ---");
+        System.out.println("1. Payroll System: Calculate employee salary, overtime, and save phone numbers.");
+        System.out.println("2. Calculator: Perform basic arithmetic operations.");
+        System.out.println("3. Phone Book: Manage employee contact details and groups.");
+        System.out.println("4. Exit: Close the program.");
+        System.out.println("Follow the prompts for each module for specific operations.");
+    }
+}
